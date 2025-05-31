@@ -10,23 +10,19 @@
 #include <algorithm>
 
 using namespace std;
-
-// Funkcija, kurią panaudosime, kad iš žodžio pašalintume skyrybos ženklus (.,;:?! etc.) gale ir pradžioje
 string cleanWord(const string& raw) {
     int start = 0;
     int end = (int)raw.size() - 1;
-    // pereiname tol, kol randame raidę arba skaičių
     while (start <= end && !isalnum((unsigned char)raw[start])) {
         start++;
     }
     while (end >= start && !isalnum((unsigned char)raw[end])) {
         end--;
     }
-    if (start > end) return ""; // reiškia, žodis buvo tik skyrybos ženklai
+    if (start > end) return ""; 
     return raw.substr(start, end - start + 1);
 }
 
-// Funkcija, kuri paverčia visą string į mažąsias raides
 string toLowerStr(const string& s) {
     string out = s;
     for (char& c : out) c = (char)tolower((unsigned char)c);
@@ -44,24 +40,16 @@ int main() {
         cerr << "Nepavyko atidaryti failo " << INPUT_FILE << " skaitymui.\n";
         return 1;
     }
-
-    // map<žodis, kiekKartu> žodžių skaičiavimui
     map<string, int> wordCount;
-    // map<žodis, set<eilutėsNumeris>> eilutės, kuriose pasikartojo žodis
     map<string, set<int>> crossRef;
 
-    // regex URL’ams: ieškos "http://...", "https://..." arba "www...."
-    // [^\s]* paims viską iki pirmo tarpo
-    regex urlRegex(R"((https?://[^\s]+)|(www\.[^\s]+))", regex::icase);
-
-    vector<string> foundURLs;
-
-    string line;
-    int lineNumber = 0;
-    while (getline(fin, line)) {
+regex urlRegex(R"((https?://[^\s]+)|(www\.[^\s]+))", regex::icase);
+vector<string> foundURLs;
+string line;
+int lineNumber = 0;
+while (getline(fin, line)) {
         lineNumber++;
-        // 1) Ieškome URL’ų toje eilutėje
-        {
+{
             auto begin = sregex_iterator(line.begin(), line.end(), urlRegex);
             auto endIt = sregex_iterator();
             for (auto it = begin; it != endIt; ++it) {
@@ -70,29 +58,25 @@ int main() {
             }
         }
 
-        // 2) Skaičiuojame žodžius eilučių ir kaupiame cross‐reference
-        // Pirmiausia "išardome" eilutę į "žodžių gabalus" su istringstream
-        istringstream iss(line);
+      istringstream iss(line);
         string rawWord;
         while (iss >> rawWord) {
-            // nukerpame skyrybos ženklus gale ir pradžioje
             string cleaned = cleanWord(rawWord);
             if (cleaned.empty()) continue;
-            // pavertėm mažosiomis, kad "Testas" ir "testas" būtų vienas žodis
             string low = toLowerStr(cleaned);
-
+            
             wordCount[low]++;
             crossRef[low].insert(lineNumber);
         }
     }
     fin.close();
 
-    // 3) Išvedame tik tuos žodžius, kurie pasikartojo daugiau nei 1 kartą
-    ofstream foutCounts(COUNTS_FILE);
+   ofstream foutCounts(COUNTS_FILE);
     if (!foutCounts.is_open()) {
         cerr << "Nepavyko sukurti " << COUNTS_FILE << " failo.\n";
         return 1;
     }
+    
     foutCounts << "Žodžiai, pasikartoję daugiau nei 1 kartą:\n";
     for (auto& p : wordCount) {
         if (p.second > 1) {
@@ -101,8 +85,7 @@ int main() {
     }
     foutCounts.close();
 
-    // 4) Išvedame cross-reference lentelę (tik žodžiai, kurie pasikartojo >1 karto)
-    ofstream foutCross(CROSSREF_FILE);
+ ofstream foutCross(CROSSREF_FILE);
     if (!foutCross.is_open()) {
         cerr << "Nepavyko sukurti " << CROSSREF_FILE << " failo.\n";
         return 1;
@@ -123,8 +106,6 @@ int main() {
         }
     }
     foutCross.close();
-
-    // 5) Išvedame rastus URL’us į atskirą failą
     ofstream foutURLs(URLS_FILE);
     if (!foutURLs.is_open()) {
         cerr << "Nepavyko sukurti " << URLS_FILE << " failo.\n";
