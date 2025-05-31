@@ -12,7 +12,7 @@ std::map<std::string, int> (pavadiinta wordCount)
 Paskirtis: skaičiuoti, kiek kartų pasikartoja kiekvienas žodis.
 Kaip veikia: raktas (key) – žodis (string), reikšmė (value) – kiek kartų jis pasirodė.
 Naudoti metodai:
-  wordCount[low]++ – jei rakto low dar nėra, automatiškai įterpia su reikšme 0, o tada prideda 1. Taip kaupiamas pasikartojimų skaičių.
+  wordCount[low]++ – jei rakto low dar nėra, automatiškai įterpia su reikšme 0, o tada prideda 1. Taip kaupiamas pasikartojimų skaičius.
   Iteracija per map (pvz., for (auto& p : wordCount)) – kad išvesti tuos žodžius, kurių skaičius > 1.
 
 std::map<std::string, std::set<int>> (pavadinta crossRef)
